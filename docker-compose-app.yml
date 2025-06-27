@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # 🚀 API Spring Boot
+  authenticuser-api:
+    build: .
+    container_name: authenticuser-api
+    ports:
+      - "8080:8080"
+    # As configurações são lidas do application.yml.
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_H2_CONSOLE_ENABLED=true
+      - SPRING_H2_CONSOLE_PATH=/h2-console
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.H2Dialect
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - JWT_SECRET=umaChaveSecretaMuitoLongaEComplexaParaAssinarTokensJWT
+      - JWT_EXPIRATION=3600000
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - app-network
+
+  # 🗄️ Banco de Dados H2 (opcional - para persistência)
+  h2-database:
+    image: oscarfonts/h2
+    container_name: h2-database
+    ports:
+      - "9092:81"
+    environment:
+      - H2_OPTIONS=-ifNotExists
+    volumes:
+      - h2_data:/h2-data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  h2_data:
+
+networks:
+  app-network:
+    driver: bridge
