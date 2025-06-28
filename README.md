@@ -92,6 +92,8 @@ json
   "username": "admin",
   "password": "123456"
 }
+
+Link para acessar o deploy realizado no railway: https://av2arqweb-production-b3f6.up.railway.app/
 Adicionar HTTP Header Manager: Clique direito em Login Request > Add > Config Element > HTTP Header Manager Configure:
 
 Name: Content-Type
